@@ -137,6 +137,9 @@ typedef struct { raw_adc_t value; celsius_t celsius; } temp_entry_t;
 #if ANY_THERMISTOR_IS(18)     // ATC Semitec 204GT-2 (4.7k pullup) Dagoma.Fr - MKS_Base_DKU001327
   #include "thermistor_18.h"
 #endif
+#if ANY_THERMISTOR_IS(19)     // 100kΩ TwoTrees 350C, table made from #14, with checks from 190C to 381C
+  #include "thermistor_19.h"
+#endif
 #if ANY_THERMISTOR_IS(22)     // Thermistor in a Rostock 301 hot end, calibrated with a multimeter
   #include "thermistor_22.h"
 #endif
