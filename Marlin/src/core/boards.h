@@ -415,6 +415,7 @@
 #define BOARD_MD_D301                 5068  // Mingda D2 DZ301 V1.0 (STM32F103ZE)
 #define BOARD_VOXELAB_AQUILA          5069  // Voxelab Aquila V1.0.0/V1.0.1 (GD32F103RC / N32G455RE / STM32F103RE)
 #define BOARD_SPRINGER_CONTROLLER     5070  // ORCA 3D SPRINGER Modular Controller (STM32F103VC)
+#define BOARD_MKS_ROBIN_NANO_UART_MOD 5999  // MKS Robin Nano (STM32F103VE) with UART pins soldered
 
 //
 // ARM Cortex-M4F
