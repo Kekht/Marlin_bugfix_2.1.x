@@ -37,6 +37,27 @@
  */
 #define CONFIGURATION_H_VERSION 02010300
 
+/**
+ * enable the BL-Touch feature when a BL-Touch is installed
+ * on a KP3S-Pro or KP3S-Pro S1 using the instructions provided
+ * by Kingroon on their blog and youtube
+ * https://kingroon.com/blogs/downloads/kingroon-kp3s-bltouch-installation
+ * https://www.youtube.com/watch?v=s2ZiibBKVKI
+ * un-comment USE_BLTOUCH if a BL-Touch is installed on your printer.
+*/
+#define USE_BLTOUCH
+
+/**
+ * after the BL-Touch is installed the offset between the probe and nozzle
+ * should be measured, actual values will vary from printer to printer and
+ * probe mount used, Z_PROBE_OFFSET is intentionally high to prevent the
+ * nozzle from crashing into the build surface. These values can be changed
+ * in the Marlin UI so ballpark values are fine.
+*/
+#define X_PROBE_OFFSET -33
+#define Y_PROBE_OFFSET -1
+#define Z_PROBE_OFFSET 0
+
 //===========================================================================
 //============================= Getting Started =============================
 //===========================================================================
@@ -1244,8 +1265,13 @@
 #define X_MAX_ENDSTOP_HIT_STATE HIGH
 #define Y_MIN_ENDSTOP_HIT_STATE LOW
 #define Y_MAX_ENDSTOP_HIT_STATE HIGH
-#define Z_MIN_ENDSTOP_HIT_STATE LOW // KP5L HIGH
-#define Z_MAX_ENDSTOP_HIT_STATE HIGH  // BLtouch
+#ifdef USE_BLTOUCH
+  #define Z_MIN_ENDSTOP_HIT_STATE LOW // KP5L HIGH
+  #define Z_MAX_ENDSTOP_HIT_STATE HIGH
+#else
+  #define Z_MIN_ENDSTOP_HIT_STATE LOW
+  #define Z_MAX_ENDSTOP_HIT_STATE HIGH
+#endif
 #define I_MIN_ENDSTOP_HIT_STATE HIGH
 #define I_MAX_ENDSTOP_HIT_STATE HIGH
 #define J_MIN_ENDSTOP_HIT_STATE HIGH
@@ -1417,10 +1443,11 @@
  * The probe replaces the Z-MIN endstop and is used for Z homing.
  * (Automatically enables USE_PROBE_FOR_Z_HOMING.)
  */
-//#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN
-
-// Force the use of the probe for Z-axis homing
-#define USE_PROBE_FOR_Z_HOMING
+#ifdef USE_BLTOUCH
+  #define USE_PROBE_FOR_Z_HOMING
+#else
+  #define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN
+#endif
 
 /**
  * Z_MIN_PROBE_PIN
@@ -1435,7 +1462,9 @@
  *    - Normally-closed (NC) also connect to GND.
  *    - Normally-open (NO) also connect to 5V.
  */
-#define Z_MIN_PROBE_PIN PC4
+#ifdef USE_BLTOUCH
+  #define Z_MIN_PROBE_PIN Z_MAX_PIN
+#endif
 
 /**
  * Probe Type
@@ -1449,7 +1478,9 @@
  * Use G29 repeatedly, adjusting the Z height at each point with movement commands
  * or (with LCD_BED_LEVELING) the LCD controller.
  */
-//#define PROBE_MANUALLY
+#ifndef USE_BLTOUCH
+  #define PROBE_MANUALLY
+#endif
 
 /**
  * A Fix-Mounted Probe either doesn't deploy or needs manual deployment.
@@ -1477,7 +1508,9 @@
 /**
  * The BLTouch probe uses a Hall effect sensor and emulates a servo.
  */
-#define BLTOUCH //BLtouch
+#ifdef USE_BLTOUCH
+  #define BLTOUCH
+#endif
 
 /**
  * MagLev V4 probe by MDD
@@ -1666,7 +1699,7 @@
  *     |    [-]    |
  *     O-- FRONT --+
  */
-#define NOZZLE_TO_PROBE_OFFSET  { -33, -1, 0 } //Bltouch
+#define NOZZLE_TO_PROBE_OFFSET { X_PROBE_OFFSET, Y_PROBE_OFFSET, Z_PROBE_OFFSET }
 
 // Enable and set to use a specific tool for probing. Disable to allow any tool.
 //#define PROBING_TOOL 0
@@ -1734,8 +1767,10 @@
  * A total of 2 does fast/slow probes with a weighted average.
  * A total of 3 or more adds more slow probes, taking the average.
  */
-#define MULTIPLE_PROBING 2 // BLtouch
-//#define EXTRA_PROBING    1
+#ifdef USE_BLTOUCH
+  #define MULTIPLE_PROBING 2
+  //#define EXTRA_PROBING    1
+#endif
 
 /**
  * Z probes require clearance when deploying, stowing, and moving between
@@ -2132,7 +2167,11 @@
  */
 //#define AUTO_BED_LEVELING_3POINT
 //#define AUTO_BED_LEVELING_LINEAR
-#define AUTO_BED_LEVELING_BILINEAR //BLtouch
+#ifdef USE_BLTOUCH
+  #define AUTO_BED_LEVELING_BILINEAR
+#else
+  #define MESH_BED_LEVELING
+#endif
 //#define AUTO_BED_LEVELING_UBL
 //#define MESH_BED_LEVELING
 
@@ -2317,7 +2356,9 @@
   #define BED_TRAMMING_HEIGHT      0.1        // (mm) Z height of nozzle at tramming points
   #define BED_TRAMMING_Z_HOP       4.0        // (mm) Z height of nozzle between tramming points
   #define BED_TRAMMING_INCLUDE_CENTER       // Move to the center after the last corner
-  #define BED_TRAMMING_USE_PROBE
+  #ifdef USE_BLTOUCH
+    #define BED_TRAMMING_USE_PROBE
+  #endif
   #if ENABLED(BED_TRAMMING_USE_PROBE)
     #define BED_TRAMMING_PROBE_TOLERANCE 0.1  // (mm)
     #define BED_TRAMMING_VERIFY_RAISED        // After adjustment triggers the probe, re-probe to verify
@@ -2367,7 +2408,9 @@
  * - Allows Z homing only when XY positions are known and trusted.
  * - If stepper drivers sleep, XY homing may be required again before Z homing.
  */
-#define Z_SAFE_HOMING //BLtouch
+#ifdef USE_BLTOUCH
+  #define Z_SAFE_HOMING
+#endif
 
 #if ENABLED(Z_SAFE_HOMING)
   #define Z_SAFE_HOMING_X_POINT X_CENTER  // (mm) X point for Z homing
